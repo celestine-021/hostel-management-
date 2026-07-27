@@ -1,32 +1,23 @@
-from datetime import datetime
+class Profile(db.Model, SerializerMixin):
+    __tablename__ = "profiles"
 
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy_serializer import SerializerMixin
-
-
-db = SQLAlchemy()
-
-
-class User(db.Model, SerializerMixin):
-    __tablename__ = "users"
-
-    serialize_rules = ("-password", "-profile.user", "-bookings.user")
+    serialize_rules = ("-user.profile",)
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(20), nullable=False, default="student")
+    full_name = db.Column(db.String(120), nullable=False)
+    phone_number = db.Column(db.String(20))
+    registration_number = db.Column(db.String(50), unique=True)
+    course = db.Column(db.String(120))
+    year_of_study = db.Column(db.Integer)
 
-    profile = db.relationship(
-        "Profile",
-        back_populates="user",
-        uselist=False,
-        cascade="all, delete-orphan"
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id"),
+        unique=True,
+        nullable=False
     )
 
-    bookings = db.relationship(
-        "Booking",
-        back_populates="user",
-        cascade="all, delete-orphan"
+    user = db.relationship(
+        "User",
+        back_populates="profile"
     )
