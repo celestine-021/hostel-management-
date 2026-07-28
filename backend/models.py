@@ -13,16 +13,15 @@ from sqlalchemy_serializer import SerializerMixin
 db = SQLAlchemy()
 
 
-# ============================================================
+# 
 # USER MODEL
-# ============================================================
 # This table stores information about users of the system.
 # Examples of users include students and administrators.
 #
 # Relationship:
 # User 1 ---- 1 Profile
 # User 1 ---- Many Bookings
-# ============================================================
+# 
 
 class User(db.Model, SerializerMixin):
 
@@ -69,10 +68,10 @@ class User(db.Model, SerializerMixin):
         default="student"
     )
 
-    # --------------------------------------------------------
+    # 
     # 1:1 RELATIONSHIP
     # One user has exactly one profile
-    # --------------------------------------------------------
+    # 
     profile = db.relationship(
         "Profile",
         back_populates="user",
@@ -80,10 +79,10 @@ class User(db.Model, SerializerMixin):
         cascade="all, delete-orphan",
     )
 
-    # --------------------------------------------------------
+    # 
     # 1:MANY RELATIONSHIP
     # One user can have many bookings
-    # --------------------------------------------------------
+    # 
     bookings = db.relationship(
         "Booking",
         back_populates="user",
@@ -91,14 +90,14 @@ class User(db.Model, SerializerMixin):
     )
 
 
-# ============================================================
+# 
 # PROFILE MODEL
-# ============================================================
+# 
 # This table stores additional information about a user.
 #
 # Relationship:
 # User 1 ---- 1 Profile
-# ============================================================
+# 
 
 class Profile(db.Model, SerializerMixin):
 
@@ -160,15 +159,15 @@ class Profile(db.Model, SerializerMixin):
     )
 
 
-# ============================================================
+# 
 # HOSTEL MODEL
-# ============================================================
+# 
 # This table stores information about JKUAT hostels.
 #
 # Relationships:
 # Hostel 1 ---- Many Rooms
 # Hostel Many ---- Many Amenities
-# ============================================================
+# 
 
 class Hostel(db.Model, SerializerMixin):
 
@@ -211,21 +210,21 @@ class Hostel(db.Model, SerializerMixin):
         nullable=False
     )
 
-    # --------------------------------------------------------
+    # 
     # 1:MANY RELATIONSHIP
     # One hostel can contain many rooms
-    # --------------------------------------------------------
+    # 
     rooms = db.relationship(
         "Room",
         back_populates="hostel",
         cascade="all, delete-orphan",
     )
 
-    # --------------------------------------------------------
+    # 
     # MANY:MANY RELATIONSHIP
     # A hostel can have many amenities
     # The relationship is handled through HostelAmenity
-    # --------------------------------------------------------
+    # 
     hostel_amenities = db.relationship(
         "HostelAmenity",
         back_populates="hostel",
@@ -233,15 +232,15 @@ class Hostel(db.Model, SerializerMixin):
     )
 
 
-# ============================================================
+# 
 # ROOM MODEL
-# ============================================================
+# 
 # This table stores information about rooms in each hostel.
 #
 # Relationships:
 # Room Many ---- 1 Hostel
 # Room 1 ---- Many Bookings
-# ============================================================
+# 
 
 class Room(db.Model, SerializerMixin):
 
@@ -300,19 +299,19 @@ class Room(db.Model, SerializerMixin):
         nullable=False,
     )
 
-    # --------------------------------------------------------
+    # 
     # MANY:1 RELATIONSHIP
     # Many rooms belong to one hostel
-    # --------------------------------------------------------
+    # 
     hostel = db.relationship(
         "Hostel",
         back_populates="rooms",
     )
 
-    # --------------------------------------------------------
+    # 
     # 1:MANY RELATIONSHIP
     # One room can have many bookings over time
-    # --------------------------------------------------------
+    # 
     bookings = db.relationship(
         "Booking",
         back_populates="room",
@@ -320,15 +319,15 @@ class Room(db.Model, SerializerMixin):
     )
 
 
-# ============================================================
+# 
 # BOOKING MODEL
-# ============================================================
+# 
 # This table stores room booking information.
 #
 # Relationships:
 # User 1 ---- Many Bookings
 # Room 1 ---- Many Bookings
-# ============================================================
+# 
 
 class Booking(db.Model, SerializerMixin):
 
@@ -388,28 +387,27 @@ class Booking(db.Model, SerializerMixin):
         nullable=False,
     )
 
-    # --------------------------------------------------------
+    # 
     # MANY:1 RELATIONSHIP
     # Many bookings can belong to one user
-    # --------------------------------------------------------
+    # 
     user = db.relationship(
         "User",
         back_populates="bookings",
     )
 
-    # --------------------------------------------------------
+    # 
     # MANY:1 RELATIONSHIP
     # Many bookings can belong to one room
-    # --------------------------------------------------------
     room = db.relationship(
         "Room",
         back_populates="bookings",
     )
 
 
-# ============================================================
+# 
 # AMENITY MODEL
-# ============================================================
+# 
 # This table stores amenities that can be offered by hostels.
 #
 # Examples:
@@ -417,7 +415,7 @@ class Booking(db.Model, SerializerMixin):
 # - Laundry
 # - Security
 # - Parking
-# ============================================================
+# 
 
 class Amenity(db.Model, SerializerMixin):
 
@@ -448,11 +446,11 @@ class Amenity(db.Model, SerializerMixin):
         db.Text
     )
 
-    # --------------------------------------------------------
+    # 
     # MANY:MANY RELATIONSHIP
     # One amenity can be available in many hostels
     # The relationship is handled through HostelAmenity
-    # --------------------------------------------------------
+    # 
     hostel_amenities = db.relationship(
         "HostelAmenity",
         back_populates="amenity",
@@ -474,7 +472,7 @@ class Amenity(db.Model, SerializerMixin):
 # Hostel A -> Laundry
 # Hostel B -> Wi-Fi
 #
-# ============================================================
+# 
 
 class HostelAmenity(db.Model, SerializerMixin):
 
@@ -501,28 +499,28 @@ class HostelAmenity(db.Model, SerializerMixin):
         nullable=False,
     )
 
-    # --------------------------------------------------------
+    # 
     # Relationship back to the Hostel model
-    # --------------------------------------------------------
+    # 
     hostel = db.relationship(
         "Hostel",
         back_populates="hostel_amenities",
     )
 
-    # --------------------------------------------------------
+    # 
     # Relationship back to the Amenity model
-    # --------------------------------------------------------
+    # 
     amenity = db.relationship(
         "Amenity",
         back_populates="hostel_amenities",
     )
 
-    # --------------------------------------------------------
+    # 
     # Prevent duplicate combinations
     #
     # This means the same amenity cannot be added to the
     # same hostel more than once.
-    # --------------------------------------------------------
+    # 
     __table_args__ = (
         db.UniqueConstraint(
             "hostel_id",

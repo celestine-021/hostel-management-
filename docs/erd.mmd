@@ -1,0 +1,65 @@
+erDiagram
+    USERS ||--o| PROFILES : has
+    USERS ||--o{ BOOKINGS : makes
+    HOSTELS ||--o{ ROOMS : contains
+    ROOMS ||--o{ BOOKINGS : has
+    HOSTELS ||--o{ HOSTEL_AMENITIES : offers
+    AMENITIES ||--o{ HOSTEL_AMENITIES : appears_in
+
+    USERS {
+        int id PK
+        string username UK
+        string email UK
+        string password
+        string role
+    }
+
+    PROFILES {
+        int id PK
+        int user_id FK, UK
+        string full_name
+        string phone_number
+        string registration_number UK
+        string course
+        int year_of_study
+    }
+
+    HOSTELS {
+        int id PK
+        string name
+        string location
+        string description
+        string gender
+    }
+
+    ROOMS {
+        int id PK
+        int hostel_id FK
+        string room_number
+        int capacity
+        int occupied_spaces
+        float price
+        string status
+    }
+
+    BOOKINGS {
+        int id PK
+        int user_id FK
+        int room_id FK
+        datetime booking_date
+        date check_in_date
+        date check_out_date
+        string status
+    }
+
+    AMENITIES {
+        int id PK
+        string name UK
+        string description
+    }
+
+    HOSTEL_AMENITIES {
+        int id PK
+        int hostel_id FK
+        int amenity_id FK
+    }
