@@ -43,3 +43,17 @@ class User(db.Model, SerializerMixin):
         nullable=False,
         default="student"
     )
+    # Relationship to Profile model
+    profile = db.relationship(
+        "Profile",        
+        back_populates="user",
+        uselist=False,  # One-to-one relationship
+        cascade="all, delete-orphan"
+    )
+
+    # Relationship to Booking model
+    bookings = db.relationship(
+        "Booking",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )

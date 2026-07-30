@@ -13,3 +13,4 @@ from backend.models.hostels import Hostel
 from backend.models.rooms import Room
 from backend.models.bookings import Booking
 from backend.models.amenities import Amenity
+from backend.models.hostel_amenities import HostelAmenity

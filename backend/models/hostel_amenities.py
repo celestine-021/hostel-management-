@@ -1,75 +1,76 @@
 # Import the shared database object
 from backend.models import db
 
-# Import SerializerMixin for converting the model into dictionaries
+# Import SerializerMixin
 from sqlalchemy_serializer import SerializerMixin
 
 
 # ============================================================
-# AMENITY MODEL
+# HOSTEL AMENITY MODEL
 # ============================================================
-# This model stores the different facilities or services
-# available in hostels.
+# This is an association table that connects hostels
+# with the amenities they provide.
 #
-# Examples:
-# Wi-Fi
-# Water
-# Electricity
-# Laundry
-# Study Room
-# Kitchen
-# Parking
-# Security
+# Relationship:
+#
+# Hostel 1 -------- Many HostelAmenities Many -------- 1 Amenity
+#
+# This allows:
+# - One hostel to have many amenities
+# - One amenity to be available in many hostels
 # ============================================================
 
-class Amenity(db.Model, SerializerMixin):
+class HostelAmenity(db.Model, SerializerMixin):
 
     # Name of the database table
-    __tablename__ = "amenities"
+    __tablename__ = "hostel_amenities"
 
     # Prevent circular references during serialization
     serialize_rules = (
-        "-hostel_amenities.amenity",
+        "-hostel.hostel_amenities",
+        "-amenity.hostel_amenities",
     )
 
     # --------------------------------------------------------
     # PRIMARY KEY
     # --------------------------------------------------------
-    # Unique identifier for each amenity
     id = db.Column(
         db.Integer,
         primary_key=True
     )
 
     # --------------------------------------------------------
-    # AMENITY NAME
+    # HOSTEL FOREIGN KEY
     # --------------------------------------------------------
-    # Name of the facility or service
-    name = db.Column(
-        db.String(100),
-        unique=True,
+    # Connects this record to a specific hostel
+    hostel_id = db.Column(
+        db.Integer,
+        db.ForeignKey("hostels.id"),
         nullable=False
     )
 
     # --------------------------------------------------------
-    # DESCRIPTION
+    # AMENITY FOREIGN KEY
     # --------------------------------------------------------
-    # Provides more information about the amenity
-    description = db.Column(
-        db.Text,
-        nullable=True
+    # Connects this record to a specific amenity
+    amenity_id = db.Column(
+        db.Integer,
+        db.ForeignKey("amenities.id"),
+        nullable=False
     )
 
     # --------------------------------------------------------
-    # RELATIONSHIP
+    # HOSTEL RELATIONSHIP
     # --------------------------------------------------------
-    # Connects the amenity to the HostelAmenity association table.
-    #
-    # This allows one amenity to be associated with
-    # multiple hostels.
+    hostel = db.relationship(
+        "Hostel",
+        back_populates="hostel_amenities"
+    )
+
     # --------------------------------------------------------
-    hostel_amenities = db.relationship(
-        "HostelAmenity",
-        back_populates="amenity",
-        cascade="all, delete-orphan"
+    # AMENITY RELATIONSHIP
+    # --------------------------------------------------------
+    amenity = db.relationship(
+        "Amenity",
+        back_populates="hostel_amenities"
     )
