@@ -113,3 +113,21 @@ class Booking(db.Model, SerializerMixin):
         db.ForeignKey("rooms.id"),
         nullable=False
     )
+
+    # --------------------------------------------------------
+    # RELATIONSHIPS
+    # --------------------------------------------------------
+    # Connect the booking to the user who made it.
+    # --------------------------------------------------------
+    user = db.relationship(
+        "User",
+        back_populates="bookings"
+    )
+
+    # --------------------------------------------------------
+    # Connect the booking to the room being booked.
+    # --------------------------------------------------------
+    room = db.relationship(
+        "Room",
+        back_populates="bookings"
+    )
