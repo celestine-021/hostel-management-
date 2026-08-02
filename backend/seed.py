@@ -1,5 +1,10 @@
+# ============================================================
+# JKUAT HOSTEL MANAGEMENT SYSTEM
+# DATABASE SEED FILE
+# ============================================================
+
 # Import the Flask application
-from backend.app import app
+from app import app
 
 # Import the shared database object
 from backend.models import db
@@ -14,16 +19,22 @@ from backend.models.amenities import Amenity
 from backend.models.hostel_amenities import HostelAmenity
 
 
-# Create the application context
-# This allows us to interact with the database
+# ============================================================
+# CREATE FLASK APPLICATION CONTEXT
+# ============================================================
+
 with app.app_context():
 
-    # 
+    # ========================================================
     # CLEAR EXISTING DATA
+    # ========================================================
+    # This allows us to run the seed file again without
+    # creating duplicate records.
+    #
     # WARNING:
-    # This deletes existing records from these tables.
-    # We are doing this so the seed can be run repeatedly
-    # during development without creating duplicate records.
+    # This deletes existing development data.
+    # Do not use this approach in production.
+    # ========================================================
 
     db.session.query(Booking).delete()
     db.session.query(HostelAmenity).delete()
@@ -33,8 +44,12 @@ with app.app_context():
     db.session.query(Hostel).delete()
     db.session.query(User).delete()
 
-    # 
+    db.session.commit()
+
+
+    # ========================================================
     # CREATE USERS
+    # ========================================================
 
     student1 = User(
         username="student1",
@@ -57,15 +72,20 @@ with app.app_context():
         role="admin"
     )
 
+    # Add users to the database
     db.session.add_all([
         student1,
         student2,
         admin
     ])
 
+    # Save users so their IDs are generated
     db.session.commit()
 
+
+    # ========================================================
     # CREATE STUDENT PROFILES
+    # ========================================================
 
     profile1 = Profile(
         full_name="John Mwangi",
@@ -85,12 +105,18 @@ with app.app_context():
         user_id=student2.id
     )
 
+    # Add profiles
     db.session.add_all([
         profile1,
         profile2
     ])
 
+    db.session.commit()
+
+
+    # ========================================================
     # CREATE HOSTELS
+    # ========================================================
 
     hostel1 = Hostel(
         name="JKUAT Hostel A",
@@ -106,6 +132,7 @@ with app.app_context():
         gender="mixed"
     )
 
+    # Add hostels
     db.session.add_all([
         hostel1,
         hostel2
@@ -113,13 +140,172 @@ with app.app_context():
 
     db.session.commit()
 
-    user_count = db.session.query(User).count()
-    profile_count = db.session.query(Profile).count()
-    hostel_count = db.session.query(Hostel).count()
-    room_count = db.session.query(Room).count()
-    booking_count = db.session.query(Booking).count()
 
-    print(
-        f"Seed data created successfully: {user_count} users, {profile_count} profiles, "
-        f"{hostel_count} hostels, {room_count} rooms, {booking_count} bookings."
+    # ========================================================
+    # CREATE ROOMS
+    # ========================================================
+
+    room1 = Room(
+        room_number="A101",
+        capacity=4,
+        occupied_spaces=1,
+        price=15000,
+        status="available",
+        hostel_id=hostel1.id
     )
+
+    room2 = Room(
+        room_number="A102",
+        capacity=4,
+        occupied_spaces=0,
+        price=15000,
+        status="available",
+        hostel_id=hostel1.id
+    )
+
+    room3 = Room(
+        room_number="B101",
+        capacity=2,
+        occupied_spaces=1,
+        price=18000,
+        status="available",
+        hostel_id=hostel2.id
+    )
+
+    # Add rooms
+    db.session.add_all([
+        room1,
+        room2,
+        room3
+    ])
+
+    db.session.commit()
+
+
+    # ========================================================
+    # CREATE AMENITIES
+    # ========================================================
+
+    wifi = Amenity(
+        name="Wi-Fi",
+        description="Internet access for hostel residents."
+    )
+
+    water = Amenity(
+        name="Water",
+        description="Reliable water supply."
+    )
+
+    laundry = Amenity(
+        name="Laundry",
+        description="Laundry facilities available to residents."
+    )
+
+    security = Amenity(
+        name="Security",
+        description="24-hour hostel security."
+    )
+
+    # Add amenities
+    db.session.add_all([
+        wifi,
+        water,
+        laundry,
+        security
+    ])
+
+    db.session.commit()
+
+
+    # ========================================================
+    # CONNECT HOSTELS WITH AMENITIES
+    # ========================================================
+
+    hostel1_wifi = HostelAmenity(
+        hostel_id=hostel1.id,
+        amenity_id=wifi.id
+    )
+
+    hostel1_water = HostelAmenity(
+        hostel_id=hostel1.id,
+        amenity_id=water.id
+    )
+
+    hostel1_security = HostelAmenity(
+        hostel_id=hostel1.id,
+        amenity_id=security.id
+    )
+
+    hostel2_wifi = HostelAmenity(
+        hostel_id=hostel2.id,
+        amenity_id=wifi.id
+    )
+
+    hostel2_water = HostelAmenity(
+        hostel_id=hostel2.id,
+        amenity_id=water.id
+    )
+
+    hostel2_laundry = HostelAmenity(
+        hostel_id=hostel2.id,
+        amenity_id=laundry.id
+    )
+
+    # Add hostel-amenity relationships
+    db.session.add_all([
+        hostel1_wifi,
+        hostel1_water,
+        hostel1_security,
+        hostel2_wifi,
+        hostel2_water,
+        hostel2_laundry
+    ])
+
+    db.session.commit()
+
+
+    # ========================================================
+    # CREATE BOOKINGS
+    # ========================================================
+
+    booking1 = Booking(
+        check_in_date="2026-09-01",
+        check_out_date="2027-06-30",
+        status="approved",
+        user_id=student1.id,
+        room_id=room1.id
+    )
+
+    booking2 = Booking(
+        check_in_date="2026-09-01",
+        check_out_date="2027-06-30",
+        status="pending",
+        user_id=student2.id,
+        room_id=room3.id
+    )
+
+    # Add bookings
+    db.session.add_all([
+        booking1,
+        booking2
+    ])
+
+    # Save all remaining data
+    db.session.commit()
+
+
+    # ========================================================
+    # SUCCESS MESSAGE
+    # ========================================================
+
+    print("========================================")
+    print("DATABASE SEEDING COMPLETED SUCCESSFULLY")
+    print("========================================")
+    print("Users created: 3")
+    print("Profiles created: 2")
+    print("Hostels created: 2")
+    print("Rooms created: 3")
+    print("Amenities created: 4")
+    print("Hostel amenities created: 6")
+    print("Bookings created: 2")
+    print("========================================")
