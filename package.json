@@ -1,0 +1,10 @@
+{
+  "name": "jkuat-hostel-management",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix frontend run dev"
+  },
+  "dependencies": {
+    "lucide-react": "^1.28.0"
+  }
+}

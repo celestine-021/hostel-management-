@@ -496,9 +496,25 @@ body {
 
   transform: translateY(-3px);
 }
-
 .card-icon {
-  font-size: 30px;
+  color: var(--primary-blue);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px;
+
+  background: var(--light-blue);
+
+  border-radius: 10px;
+
+  transition: all 0.2s ease;
+}
+
+.dashboard-card:hover .card-icon {
+  color: var(--amber);
+  background: #fff7ed;
 }
 
 .dashboard-card h3 {
