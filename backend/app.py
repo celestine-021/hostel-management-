@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_migrate import Migrate
 
 from backend.models import db
@@ -28,12 +28,32 @@ def create_app():
     # Initialize Flask-Migrate
     Migrate(app, db)
 
+    with app.app_context():
+        db.create_all()
+
     # Test route
     @app.route("/")
     def home():
         return {
             "message": "JKUAT Hostel Management System API is running!"
         }
+
+    @app.route("/profiles")
+    def profiles():
+        profiles = Profile.query.all()
+        payload = [
+            {
+                "id": profile.id,
+                "full_name": profile.full_name,
+                "phone_number": profile.phone_number,
+                "registration_number": profile.registration_number,
+                "course": profile.course,
+                "year_of_study": profile.year_of_study,
+                "user_id": profile.user_id,
+            }
+            for profile in profiles
+        ]
+        return jsonify(payload)
 
     return app
 
