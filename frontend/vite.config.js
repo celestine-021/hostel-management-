@@ -16,6 +16,18 @@ export default defineConfig({
         target: 'http://127.0.0.1:5000',
         changeOrigin: true,
       },
+      '/hostels': {
+        target: 'http://127.0.0.1:5000',
+        changeOrigin: true,
+      },
+      '/rooms': {
+        target: 'http://127.0.0.1:5000',
+        changeOrigin: true,
+      },
+      '/students': {
+        target: 'http://127.0.0.1:5000',
+        changeOrigin: true,
+      },
     },
   },
 })
