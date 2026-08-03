@@ -7,8 +7,9 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     setError("");
@@ -18,27 +19,37 @@ function Login() {
       return;
     }
 
-    /*
-      Temporary login.
+    setLoading(true);
 
-      We will replace this with your
-      real Quart JWT authentication.
-    */
+    try {
+      const response = await fetch("/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (
-      email === "admin@jkuat.ac.ke" &&
-      password === "123456"
-    ) {
-      localStorage.setItem(
-        "token",
-        "temporary-demo-token"
-      );
+      let data = {};
+      const contentType = response.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        data = { message: text || "Unable to reach the server." };
+      }
 
+      if (!response.ok) {
+        throw new Error(data.message || "Invalid email or password.");
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userRole", data.role);
       navigate("/dashboard");
-    } else {
-      setError(
-        "Invalid email or password."
-      );
+    } catch (err) {
+      setError(err.message || "Invalid email or password.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -108,8 +119,9 @@ function Login() {
           <button
             type="submit"
             className="login-button"
+            disabled={loading}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
 
         </form>
