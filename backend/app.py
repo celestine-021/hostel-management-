@@ -19,8 +19,14 @@ def create_app():
     # Create Flask application
     app = Flask(__name__)
 
-    # Enable CORS
-    CORS(app)
+    # Enable CORS for all routes, domains, and methods
+    CORS(
+        app,
+        resources={r"/*": {"origins": "*"}},
+        supports_credentials=True,
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allow_headers=["Content-Type", "Authorization"],
+    )
 
     # Load configuration
     app.config.from_object(Config)
@@ -41,7 +47,7 @@ def create_app():
             "message": "JKUAT Hostel Management System API is running!"
         }
 
-    @app.route("/profiles")
+    @app.route("/profiles", methods=["GET"])
     def profiles():
         profiles = Profile.query.all()
         payload = [
@@ -58,7 +64,7 @@ def create_app():
         ]
         return jsonify(payload)
 
-    @app.route("/hostels", methods=["GET", "POST"])
+    @app.route("/hostels", methods=["GET", "POST", "OPTIONS"])
     def hostels():
         if request.method == "POST":
             data = request.get_json(silent=True) or {}
@@ -70,7 +76,7 @@ def create_app():
             )
             db.session.add(hostel)
             db.session.commit()
-            return jsonify({"message": "Hostel created", "hostel": {"id": hostel.id, "name": hostel.name}})
+            return jsonify({"message": "Hostel created", "hostel": {"id": hostel.id, "name": hostel.name}}), 201
 
         hostels_list = Hostel.query.all()
         return jsonify([
@@ -86,7 +92,7 @@ def create_app():
             for hostel in hostels_list
         ])
 
-    @app.route("/rooms", methods=["GET", "POST"])
+    @app.route("/rooms", methods=["GET", "POST", "OPTIONS"])
     def rooms():
         if request.method == "POST":
             data = request.get_json(silent=True) or {}
@@ -104,14 +110,14 @@ def create_app():
             )
             db.session.add(room)
             db.session.commit()
-            return jsonify({"message": "Room created", "room": {"id": room.id, "room_number": room.room_number}})
+            return jsonify({"message": "Room created", "room": {"id": room.id, "room_number": room.room_number}}), 201
 
         rooms_list = Room.query.all()
         return jsonify([
             {
                 "id": room.id,
                 "room_number": room.room_number,
-                "hostel": room.hostel.name,
+                "hostel": room.hostel.name if room.hostel else "Unassigned",
                 "capacity": room.capacity,
                 "occupied_spaces": room.occupied_spaces,
                 "available_beds": room.capacity - room.occupied_spaces,
@@ -120,16 +126,21 @@ def create_app():
             for room in rooms_list
         ])
 
-    @app.route("/students", methods=["GET", "POST"])
+    @app.route("/students", methods=["GET", "POST", "OPTIONS"])
     def students():
         if request.method == "POST":
             data = request.get_json(silent=True) or {}
             email = (data.get("email") or "").strip().lower()
-            password = data.get("password") or ""
+            password = data.get("password") or "default123"  # Ensure password is non-empty
+            
+            if not email:
+                return jsonify({"message": "Email is required."}), 400
+
             user = User.query.filter_by(email=email).first()
             if not user:
+                username = (data.get("full_name") or email.split("@")[0]).replace(" ", "").lower()
                 user = User(
-                    username=(data.get("full_name") or email.split("@")[0]).replace(" ", "").lower(),
+                    username=username,
                     email=email,
                     password=password,
                     role="student",
@@ -137,17 +148,27 @@ def create_app():
                 db.session.add(user)
                 db.session.commit()
 
-            profile = Profile(
-                full_name=data.get("full_name", "").strip(),
-                phone_number=data.get("phone_number", "").strip(),
-                registration_number=data.get("registration_number", "").strip(),
-                course=data.get("course", "").strip(),
-                year_of_study=int(data.get("year_of_study", 0) or 0),
-                user_id=user.id,
-            )
-            db.session.add(profile)
+            # Prevent duplicate profile for same user
+            profile = Profile.query.filter_by(user_id=user.id).first()
+            if not profile:
+                profile = Profile(
+                    full_name=data.get("full_name", "").strip(),
+                    phone_number=data.get("phone_number", "").strip(),
+                    registration_number=data.get("registration_number", "").strip(),
+                    course=data.get("course", "").strip(),
+                    year_of_study=int(data.get("year_of_study", 1) or 1),
+                    user_id=user.id,
+                )
+                db.session.add(profile)
+            else:
+                profile.full_name = data.get("full_name", profile.full_name)
+                profile.phone_number = data.get("phone_number", profile.phone_number)
+                profile.registration_number = data.get("registration_number", profile.registration_number)
+                profile.course = data.get("course", profile.course)
+                profile.year_of_study = int(data.get("year_of_study", profile.year_of_study))
+
             db.session.commit()
-            return jsonify({"message": "Student created", "student": {"id": user.id, "email": user.email}})
+            return jsonify({"message": "Student processed", "student": {"id": user.id, "email": user.email}}), 201
 
         students_list = []
         for user in User.query.filter_by(role="student").all():
@@ -163,7 +184,7 @@ def create_app():
             })
         return jsonify(students_list)
 
-    @app.route("/auth/login", methods=["POST"])
+    @app.route("/auth/login", methods=["POST", "OPTIONS"])
     def login():
         data = request.get_json(silent=True) or {}
         email = (data.get("email") or "").strip().lower()
