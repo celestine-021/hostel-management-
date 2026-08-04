@@ -1,18 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 function Sidebar() {
-  // Grab current URL path to highlight active navigation link
+  // Extract current location to identify active navigation routes
   const location = useLocation();
   const navigate = useNavigate();
+  
+  // Track currently hovered item index for amber highlight state
+  const [hoveredIndex, setHoveredIndex] = useState(null);
 
-  // Clear local auth token and redirect user back to login
+  // Clear local session storage and redirect user to login
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login");
   };
 
-  // Define navigation routes and display names
+  // Centralized route definitions for navigation items
   const navItems = [
     { name: "Dashboard", path: "/dashboard" },
     { name: "Students", path: "/students" },
@@ -24,7 +27,7 @@ function Sidebar() {
     <div
       style={{
         width: "240px",
-        backgroundColor: "#48CAE4", // Matching cyan branding
+        backgroundColor: "#00B4D8", // Sky blue brand color
         minHeight: "100vh",
         padding: "20px 15px",
         display: "flex",
@@ -34,29 +37,37 @@ function Sidebar() {
       }}
     >
       <div>
-        {/* App Title Header */}
-        <h2 style={{ color: "#1D3557", margin: "0 0 5px 0" }}>JKUAT</h2>
-        <p style={{ color: "#457B9D", margin: "0 0 30px 0", fontSize: "14px" }}>
+        {/* Brand logo and application context */}
+        <h2 style={{ color: "#03045E", margin: "0 0 5px 0" }}>JKUAT</h2>
+        <p style={{ color: "#CAF0F8", margin: "0 0 30px 0", fontSize: "14px" }}>
           Hostel Management
         </p>
 
-        {/* Dynamic Navigation Links */}
+        {/* Dynamic navigation routing list */}
         <nav style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          {navItems.map((item) => {
-            // Apply active orange background if current path matches item route
+          {navItems.map((item, index) => {
             const isActive = location.pathname === item.path;
+            const isHovered = hoveredIndex === index;
+
             return (
               <Link
                 key={item.name}
                 to={item.path}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
                 style={{
                   padding: "10px 15px",
                   borderRadius: "8px",
                   textDecoration: "none",
                   fontWeight: "bold",
-                  color: isActive ? "#FFFFFF" : "#1D3557",
-                  backgroundColor: isActive ? "#F4A261" : "transparent",
-                  transition: "all 0.2s ease",
+                  color: isActive || isHovered ? "#03045E" : "#FFFFFF",
+                  // Transition base color to vibrant amber (#FFB703) on hover or active selection
+                  backgroundColor: isActive
+                    ? "#FFB703"
+                    : isHovered
+                    ? "#FFC300"
+                    : "transparent",
+                  transition: "all 0.2s ease-in-out",
                 }}
               >
                 {item.name}
@@ -66,7 +77,7 @@ function Sidebar() {
         </nav>
       </div>
 
-      {/* Logout Action Button */}
+      {/* Account logout action button */}
       <button
         onClick={handleLogout}
         style={{
@@ -74,7 +85,7 @@ function Sidebar() {
           backgroundColor: "#F8F9FA",
           border: "none",
           borderRadius: "6px",
-          color: "#6C757D",
+          color: "#03045E",
           fontWeight: "bold",
           cursor: "pointer",
         }}

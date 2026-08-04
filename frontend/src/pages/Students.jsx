@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from "react";
-// Import shared sidebar directly from components directory
+// Import main navigation sidebar
 import Sidebar from "../components/Sidebar";
 
-// Live Render backend URL fallback
+// Live Render API fallback URL
 const API_BASE_URL =
   process.env.REACT_APP_API_URL ||
   "https://hostel-management-backend-355h.onrender.com";
 
 function Students() {
-  // Application state hooks
+  // Page state variables for handling student datasets, form toggles, and UI status
   const [students, setStudents] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [btnHover, setBtnHover] = useState(false);
 
-  // Controlled form inputs state matching database schema
+  // Form input field state matching backend database schema
   const [formData, setFormData] = useState({
     full_name: "",
     email: "",
@@ -23,28 +24,27 @@ function Students() {
     year_of_study: 1,
   });
 
-  // Fetch student directory when component mounts
+  // Fetch initial student records upon component mount
   useEffect(() => {
     fetchStudents();
   }, []);
 
-  // Retrieve all student records from Flask API endpoint
+  // Request all student records from Flask API
   const fetchStudents = async () => {
     setLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/students`);
       if (!response.ok) throw new Error("Failed to fetch students");
       const data = await response.json();
-      // Ensure state receives an array to prevent .map() errors
       setStudents(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error("Error fetching student records:", err);
+      console.error("Error retrieving student list:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // POST new student form payload to Flask backend
+  // Submit payload for creating a new student record
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -54,9 +54,9 @@ function Students() {
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) throw new Error("Failed to create student");
+      if (!response.ok) throw new Error("Failed to register student");
 
-      // Reset form state and hide modal view after saving
+      // Reset form fields and hide modal view after save completes
       setFormData({
         full_name: "",
         email: "",
@@ -67,7 +67,7 @@ function Students() {
       });
       setShowForm(false);
       
-      // Refresh directory list
+      // Refresh directory
       fetchStudents();
     } catch (err) {
       alert(err.message);
@@ -76,34 +76,37 @@ function Students() {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#F8F9FA" }}>
-      {/* Left Navigation Sidebar */}
+      {/* Left Navigation Menu */}
       <Sidebar />
 
-      {/* Main Content Area Container */}
+      {/* Main Content Workspace */}
       <div style={{ flex: 1, padding: "40px", boxSizing: "border-box" }}>
-        <h1 style={{ color: "#1D3557", marginBottom: "5px" }}>Student Directory</h1>
+        <h1 style={{ color: "#03045E", marginBottom: "5px" }}>Student Directory</h1>
         <p style={{ color: "#6C757D", marginBottom: "25px" }}>
           Manage registered JKUAT students.
         </p>
 
-        {/* Action button to toggle registration form */}
+        {/* Interactive action button toggles student creation form */}
         <button
           onClick={() => setShowForm(!showForm)}
+          onMouseEnter={() => setBtnHover(true)}
+          onMouseLeave={() => setBtnHover(false)}
           style={{
             padding: "10px 20px",
-            backgroundColor: "#48CAE4",
-            color: "#FFFFFF",
+            backgroundColor: btnHover ? "#FFB703" : "#00B4D8", // Sky blue base, Amber hover
+            color: btnHover ? "#03045E" : "#FFFFFF",
             border: "none",
             borderRadius: "6px",
             fontWeight: "bold",
             cursor: "pointer",
             marginBottom: "20px",
+            transition: "all 0.2s ease-in-out",
           }}
         >
           {showForm ? "Cancel" : "Add Student"}
         </button>
 
-        {/* Registration Form Card */}
+        {/* Collapsible Form for Registering New Students */}
         {showForm && (
           <div
             style={{
@@ -114,7 +117,7 @@ function Students() {
               marginBottom: "25px",
             }}
           >
-            <h3 style={{ marginTop: 0, color: "#1D3557" }}>Add New Student</h3>
+            <h3 style={{ marginTop: 0, color: "#03045E" }}>Add New Student</h3>
             <form
               onSubmit={handleSubmit}
               style={{
@@ -172,8 +175,8 @@ function Students() {
                 style={{
                   gridColumn: "span 2",
                   padding: "10px",
-                  backgroundColor: "#F4A261",
-                  color: "#FFF",
+                  backgroundColor: "#FFB703", // Amber submit button
+                  color: "#03045E",
                   border: "none",
                   borderRadius: "6px",
                   fontWeight: "bold",
@@ -186,7 +189,7 @@ function Students() {
           </div>
         )}
 
-        {/* Directory Table Styled to Match Dashboard Cards */}
+        {/* Directory Data Display Table Card */}
         <div
           style={{
             backgroundColor: "#FFFFFF",
@@ -202,7 +205,7 @@ function Students() {
           ) : (
             <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
               <thead>
-                <tr style={{ backgroundColor: "#48CAE4", color: "#FFFFFF" }}>
+                <tr style={{ backgroundColor: "#00B4D8", color: "#FFFFFF" }}>
                   <th style={{ padding: "12px" }}>ID</th>
                   <th style={{ padding: "12px" }}>Full Name</th>
                   <th style={{ padding: "12px" }}>Email</th>
