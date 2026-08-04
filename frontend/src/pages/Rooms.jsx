@@ -1,133 +1,87 @@
 import React, { useState, useEffect } from "react";
+// Import navigation sidebar component
+import Sidebar from "../components/Sidebar";
 
-// Use live Render backend URL fallback
+// Live Render backend URL fallback
 const API_BASE_URL =
   process.env.REACT_APP_API_URL ||
   "https://hostel-management-backend-355h.onrender.com";
 
 function Rooms() {
   const [rooms, setRooms] = useState([]);
-  const [hostels, setHostels] = useState([]);
-  const [formData, setFormData] = useState({
-    hostel_id: "",
-    room_number: "",
-    capacity: 2,
-    price: 0,
-  });
+  const [loading, setLoading] = useState(true);
 
+  // Load room directory on mount
   useEffect(() => {
     fetchRooms();
-    fetchHostels();
   }, []);
 
-  // Retrieve room listings from Render
+  // Fetch rooms list from Render API
   const fetchRooms = async () => {
+    setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/rooms`);
-      if (res.ok) {
-        const data = await res.json();
-        setRooms(Array.isArray(data) ? data : []);
-      }
+      const response = await fetch(`${API_BASE_URL}/rooms`);
+      if (!response.ok) throw new Error("Failed to fetch rooms");
+      const data = await response.json();
+      setRooms(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error("Failed to load rooms:", err);
-    }
-  };
-
-  // Retrieve hostel dropdown options from Render
-  const fetchHostels = async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/hostels`);
-      if (res.ok) {
-        const data = await res.json();
-        setHostels(Array.isArray(data) ? data : []);
-      }
-    } catch (err) {
-      console.error("Failed to load hostels for selection:", err);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/rooms`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to create room record");
-      }
-
-      setFormData({ hostel_id: "", room_number: "", capacity: 2, price: 0 });
-      fetchRooms();
-    } catch (err) {
-      console.error("Error creating room:", err);
+      console.error("Error fetching rooms:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Rooms</h2>
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#F8F9FA" }}>
+      {/* Navigation Sidebar */}
+      <Sidebar />
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-        <h3>Add Room</h3>
-        <select
-          value={formData.hostel_id}
-          onChange={(e) => setFormData({ ...formData, hostel_id: e.target.value })}
-          required
+      {/* Main Page Area */}
+      <div style={{ flex: 1, padding: "40px", boxSizing: "border-box" }}>
+        <h1 style={{ color: "#1D3557", marginBottom: "5px" }}>Rooms Directory</h1>
+        <p style={{ color: "#6C757D", marginBottom: "25px" }}>
+          View room allocations and current occupancy levels.
+        </p>
+
+        {/* Directory Table Card */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "10px",
+            padding: "20px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+          }}
         >
-          <option value="">Select Hostel</option>
-          {hostels.map((h) => (
-            <option key={h.id} value={h.id}>
-              {h.name}
-            </option>
-          ))}
-        </select>
-        <input
-          type="text"
-          placeholder="Room Number"
-          value={formData.room_number}
-          onChange={(e) => setFormData({ ...formData, room_number: e.target.value })}
-          required
-        />
-        <input
-          type="number"
-          placeholder="Capacity"
-          value={formData.capacity}
-          onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
-        />
-        <input
-          type="number"
-          placeholder="Price"
-          value={formData.price}
-          onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-        />
-        <button type="submit">Add Room</button>
-      </form>
-
-      {/* Display active room records */}
-      <table border="1" cellPadding="8">
-        <thead>
-          <tr>
-            <th>Room Number</th>
-            <th>Hostel</th>
-            <th>Capacity</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rooms.map((room) => (
-            <tr key={room.id}>
-              <td>{room.room_number}</td>
-              <td>{room.hostel}</td>
-              <td>{room.capacity}</td>
-              <td>{room.status}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          {loading ? (
+            <p>Loading room data...</p>
+          ) : rooms.length === 0 ? (
+            <p style={{ color: "#6C757D" }}>No rooms registered.</p>
+          ) : (
+            <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+              <thead>
+                <tr style={{ backgroundColor: "#48CAE4", color: "#FFFFFF" }}>
+                  <th style={{ padding: "12px" }}>ID</th>
+                  <th style={{ padding: "12px" }}>Room Number</th>
+                  <th style={{ padding: "12px" }}>Hostel ID</th>
+                  <th style={{ padding: "12px" }}>Occupancy</th>
+                  <th style={{ padding: "12px" }}>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rooms.map((room) => (
+                  <tr key={room.id} style={{ borderBottom: "1px solid #E9ECEF" }}>
+                    <td style={{ padding: "12px" }}>{room.id}</td>
+                    <td style={{ padding: "12px" }}>{room.room_number}</td>
+                    <td style={{ padding: "12px" }}>{room.hostel_id}</td>
+                    <td style={{ padding: "12px" }}>{room.capacity || "N/A"}</td>
+                    <td style={{ padding: "12px" }}>{room.status || "Available"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+// Import navigation sidebar component
+import Sidebar from "../components/Sidebar";
 
-// Use live Render backend endpoint with fallback to local development
+// Live Render backend URL fallback
 const API_BASE_URL =
   process.env.REACT_APP_API_URL ||
   "https://hostel-management-backend-355h.onrender.com";
@@ -8,26 +10,20 @@ const API_BASE_URL =
 function Hostels() {
   const [hostels, setHostels] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({
-    name: "",
-    location: "",
-    description: "",
-    gender: "mixed",
-  });
 
-  // Fetch hostels on page mount
+  // Load hostels on component load
   useEffect(() => {
     fetchHostels();
   }, []);
 
+  // Fetch hostel records from Render API
   const fetchHostels = async () => {
+    setLoading(true);
     try {
-      // Send GET request to live Render backend
       const response = await fetch(`${API_BASE_URL}/hostels`);
-      if (response.ok) {
-        const data = await response.json();
-        setHostels(Array.isArray(data) ? data : []);
-      }
+      if (!response.ok) throw new Error("Failed to fetch hostels");
+      const data = await response.json();
+      setHostels(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error fetching hostels:", err);
     } finally {
@@ -35,112 +31,55 @@ function Hostels() {
     }
   };
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      // POST new hostel data directly to Render API
-      const response = await fetch(`${API_BASE_URL}/hostels`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.message || "Failed to create hostel.");
-      }
-
-      // Reset form input values after saving
-      setFormData({
-        name: "",
-        location: "",
-        description: "",
-        gender: "mixed",
-      });
-
-      // Reload list to display newly created hostel
-      fetchHostels();
-    } catch (err) {
-      console.error("Error creating hostel:", err);
-      alert(err.message);
-    }
-  };
-
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Hostels</h2>
-      <p>Manage JKUAT hostel buildings.</p>
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#F8F9FA" }}>
+      {/* Navigation Sidebar */}
+      <Sidebar />
 
-      {/* Form to submit a new hostel */}
-      <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-        <h3>Add Hostel</h3>
-        <input
-          type="text"
-          name="name"
-          placeholder="Hostel Name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="text"
-          name="location"
-          placeholder="Location"
-          value={formData.location}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="description"
-          placeholder="Description"
-          value={formData.description}
-          onChange={handleChange}
-        />
-        <select name="gender" value={formData.gender} onChange={handleChange}>
-          <option value="mixed">Mixed</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-        </select>
-        <button type="submit">Save Hostel</button>
-      </form>
+      {/* Main Page Area */}
+      <div style={{ flex: 1, padding: "40px", boxSizing: "border-box" }}>
+        <h1 style={{ color: "#1D3557", marginBottom: "5px" }}>Hostels Directory</h1>
+        <p style={{ color: "#6C757D", marginBottom: "25px" }}>
+          View and manage all registered campus hostels.
+        </p>
 
-      {/* Hostel list view */}
-      <h3>Hostel List</h3>
-      {loading ? (
-        <p>Loading hostels...</p>
-      ) : hostels.length === 0 ? (
-        <p>No hostels found.</p>
-      ) : (
-        <table border="1" cellPadding="8">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Hostel Name</th>
-              <th>Gender</th>
-              <th>Total Rooms</th>
-              <th>Available Rooms</th>
-            </tr>
-          </thead>
-          <tbody>
-            {hostels.map((h) => (
-              <tr key={h.id}>
-                <td>{h.id}</td>
-                <td>{h.name}</td>
-                <td>{h.gender}</td>
-                <td>{h.total_rooms}</td>
-                <td>{h.available_rooms}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+        {/* Directory Table Card */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "10px",
+            padding: "20px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+          }}
+        >
+          {loading ? (
+            <p>Loading hostels...</p>
+          ) : hostels.length === 0 ? (
+            <p style={{ color: "#6C757D" }}>No hostels recorded.</p>
+          ) : (
+            <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+              <thead>
+                <tr style={{ backgroundColor: "#48CAE4", color: "#FFFFFF" }}>
+                  <th style={{ padding: "12px" }}>ID</th>
+                  <th style={{ padding: "12px" }}>Name</th>
+                  <th style={{ padding: "12px" }}>Gender Designation</th>
+                  <th style={{ padding: "12px" }}>Capacity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {hostels.map((hostel) => (
+                  <tr key={hostel.id} style={{ borderBottom: "1px solid #E9ECEF" }}>
+                    <td style={{ padding: "12px" }}>{hostel.id}</td>
+                    <td style={{ padding: "12px" }}>{hostel.name}</td>
+                    <td style={{ padding: "12px" }}>{hostel.gender || "Mixed"}</td>
+                    <td style={{ padding: "12px" }}>{hostel.capacity || "N/A"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
