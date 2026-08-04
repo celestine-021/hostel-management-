@@ -1,6 +1,60 @@
+import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 
 function Dashboard() {
+  const [totalHostels, setTotalHostels] = useState(0);
+  const [totalRooms, setTotalRooms] = useState(0);
+  const [availableRooms, setAvailableRooms] = useState(0);
+  const [totalStudents, setTotalStudents] = useState(0);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      // Fetch hostels
+      const hostelsResponse = await fetch(
+        "http://localhost:5000/api/hostels"
+      );
+
+      const hostelsData = await hostelsResponse.json();
+
+      setTotalHostels(hostelsData.length);
+
+      // Fetch rooms
+      const roomsResponse = await fetch(
+        "http://localhost:5000/api/rooms"
+      );
+
+      const roomsData = await roomsResponse.json();
+
+      setTotalRooms(roomsData.length);
+
+      // Count available rooms
+      const available = roomsData.filter(
+        (room) => room.status === "Available"
+      );
+
+      setAvailableRooms(available.length);
+
+      // Fetch students
+      const studentsResponse = await fetch(
+        "http://localhost:5000/api/students"
+      );
+
+      const studentsData = await studentsResponse.json();
+
+      setTotalStudents(studentsData.length);
+
+    } catch (error) {
+      console.error(
+        "Error fetching dashboard data:",
+        error
+      );
+    }
+  };
+
   return (
     <div className="app-layout">
 
@@ -9,13 +63,10 @@ function Dashboard() {
       <main className="main-content">
 
         {/* Header */}
-
         <div className="topbar">
 
           <div>
-            <h1>
-              Dashboard
-            </h1>
+            <h1>Dashboard</h1>
 
             <p>
               Welcome to the JKUAT Hostel
@@ -30,7 +81,6 @@ function Dashboard() {
         </div>
 
         {/* Statistics */}
-
         <div className="dashboard-cards">
 
           <div className="dashboard-card">
@@ -40,17 +90,12 @@ function Dashboard() {
             </div>
 
             <div>
-              <h3>
-                Total Students
-              </h3>
+              <h3>Total Students</h3>
 
-              <p>
-                0
-              </p>
+              <p>{totalStudents}</p>
             </div>
 
           </div>
-
 
           <div className="dashboard-card">
 
@@ -59,17 +104,12 @@ function Dashboard() {
             </div>
 
             <div>
-              <h3>
-                Total Hostels
-              </h3>
+              <h3>Total Hostels</h3>
 
-              <p>
-                0
-              </p>
+              <p>{totalHostels}</p>
             </div>
 
           </div>
-
 
           <div className="dashboard-card">
 
@@ -78,17 +118,12 @@ function Dashboard() {
             </div>
 
             <div>
-              <h3>
-                Total Rooms
-              </h3>
+              <h3>Total Rooms</h3>
 
-              <p>
-                0
-              </p>
+              <p>{totalRooms}</p>
             </div>
 
           </div>
-
 
           <div className="dashboard-card">
 
@@ -97,13 +132,9 @@ function Dashboard() {
             </div>
 
             <div>
-              <h3>
-                Available Rooms
-              </h3>
+              <h3>Available Rooms</h3>
 
-              <p>
-                0
-              </p>
+              <p>{availableRooms}</p>
             </div>
 
           </div>
@@ -111,7 +142,6 @@ function Dashboard() {
         </div>
 
         {/* Recent Activities */}
-
         <div className="content-card">
 
           <h2>
@@ -133,4 +163,5 @@ function Dashboard() {
     </div>
   );
 }
+
 export default Dashboard;
