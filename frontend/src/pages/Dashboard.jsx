@@ -11,39 +11,47 @@ function Dashboard() {
     fetchDashboardData();
   }, []);
 
+  // Fetch dashboard statistics from the backend
   const fetchDashboardData = async () => {
-    try {
+  console.log("Fetching dashboard data...");
+  try {
       // Fetch hostels
       const hostelsResponse = await fetch(
-        "http://localhost:5000/api/hostels"
+        "http://localhost:5000/hostels"
       );
 
       const hostelsData = await hostelsResponse.json();
+
+      console.log("Hostels:", hostelsData);
 
       setTotalHostels(hostelsData.length);
 
       // Fetch rooms
       const roomsResponse = await fetch(
-        "http://localhost:5000/api/rooms"
+        "http://localhost:5000/rooms"
       );
 
       const roomsData = await roomsResponse.json();
+
+      console.log("Rooms:", roomsData);
 
       setTotalRooms(roomsData.length);
 
       // Count available rooms
       const available = roomsData.filter(
-        (room) => room.status === "Available"
+        (room) => room.status === "available"
       );
 
       setAvailableRooms(available.length);
 
       // Fetch students
       const studentsResponse = await fetch(
-        "http://localhost:5000/api/students"
+        "http://localhost:5000/students"
       );
 
       const studentsData = await studentsResponse.json();
+
+      console.log("Students:", studentsData);
 
       setTotalStudents(studentsData.length);
 
