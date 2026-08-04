@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 
+// Replace local host with your live Render URL (or fallback to local during development)
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL ||
+  "https://hostel-management-backend-355h.onrender.com";
+
 function Dashboard() {
   const [totalHostels, setTotalHostels] = useState(0);
   const [totalRooms, setTotalRooms] = useState(0);
@@ -13,161 +18,94 @@ function Dashboard() {
 
   // Fetch dashboard statistics from the backend
   const fetchDashboardData = async () => {
-  console.log("Fetching dashboard data...");
-  try {
+    console.log("Fetching dashboard data...");
+    try {
       // Fetch hostels
-      const hostelsResponse = await fetch(
-        "http://localhost:5000/hostels"
-      );
-
+      const hostelsResponse = await fetch(`${API_BASE_URL}/hostels`);
       const hostelsData = await hostelsResponse.json();
-
       console.log("Hostels:", hostelsData);
-
       setTotalHostels(hostelsData.length);
 
       // Fetch rooms
-      const roomsResponse = await fetch(
-        "http://localhost:5000/rooms"
-      );
-
+      const roomsResponse = await fetch(`${API_BASE_URL}/rooms`);
       const roomsData = await roomsResponse.json();
-
       console.log("Rooms:", roomsData);
-
       setTotalRooms(roomsData.length);
 
       // Count available rooms
       const available = roomsData.filter(
         (room) => room.status === "available"
       );
-
       setAvailableRooms(available.length);
 
       // Fetch students
-      const studentsResponse = await fetch(
-        "http://localhost:5000/students"
-      );
-
+      const studentsResponse = await fetch(`${API_BASE_URL}/students`);
       const studentsData = await studentsResponse.json();
-
       console.log("Students:", studentsData);
-
       setTotalStudents(studentsData.length);
 
     } catch (error) {
-      console.error(
-        "Error fetching dashboard data:",
-        error
-      );
+      console.error("Error fetching dashboard data:", error);
     }
   };
 
   return (
     <div className="app-layout">
-
       <Sidebar />
 
       <main className="main-content">
-
         {/* Header */}
         <div className="topbar">
-
           <div>
             <h1>Dashboard</h1>
-
-            <p>
-              Welcome to the JKUAT Hostel
-              Management System.
-            </p>
+            <p>Welcome to the JKUAT Hostel Management System.</p>
           </div>
-
-          <div className="user-info">
-            Administrator
-          </div>
-
+          <div className="user-info">Administrator</div>
         </div>
 
         {/* Statistics */}
         <div className="dashboard-cards">
-
           <div className="dashboard-card">
-
-            <div className="card-icon">
-              👨‍🎓
-            </div>
-
+            <div className="card-icon">👨‍🎓</div>
             <div>
               <h3>Total Students</h3>
-
               <p>{totalStudents}</p>
             </div>
-
           </div>
 
           <div className="dashboard-card">
-
-            <div className="card-icon">
-              🏢
-            </div>
-
+            <div className="card-icon">🏢</div>
             <div>
               <h3>Total Hostels</h3>
-
               <p>{totalHostels}</p>
             </div>
-
           </div>
 
           <div className="dashboard-card">
-
-            <div className="card-icon">
-              🚪
-            </div>
-
+            <div className="card-icon">🚪</div>
             <div>
               <h3>Total Rooms</h3>
-
               <p>{totalRooms}</p>
             </div>
-
           </div>
 
           <div className="dashboard-card">
-
-            <div className="card-icon">
-              🛏️
-            </div>
-
+            <div className="card-icon">🛏️</div>
             <div>
               <h3>Available Rooms</h3>
-
               <p>{availableRooms}</p>
             </div>
-
           </div>
-
         </div>
 
         {/* Recent Activities */}
         <div className="content-card">
-
-          <h2>
-            Recent Activities
-          </h2>
-
+          <h2>Recent Activities</h2>
           <div className="empty-state">
-
-            <p>
-              No recent activities available.
-            </p>
-
+            <p>No recent activities available.</p>
           </div>
-
         </div>
-
       </main>
-
     </div>
   );
 }
