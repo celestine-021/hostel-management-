@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_migrate import Migrate
-
+from flask_cors import CORS
 from backend.models import db
 
 # Import models so Flask-Migrate knows about them
@@ -18,6 +18,9 @@ def create_app():
 
     # Create Flask application
     app = Flask(__name__)
+
+    # Enable CORS
+    CORS(app)
 
     # Load configuration
     app.config.from_object(Config)

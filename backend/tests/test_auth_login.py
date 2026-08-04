@@ -120,6 +120,36 @@ class AuthLoginTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(User.query.filter_by(email="alice@example.com").first() is not None)
 
+    def test_student_creation_rejects_duplicate_registration_number(self):
+        self.client.post(
+            "/students",
+            json={
+                "full_name": "Alice Otieno",
+                "email": "alice@example.com",
+                "password": "student123",
+                "phone_number": "0711223344",
+                "registration_number": "EN01-0101-2024",
+                "course": "Computer Science",
+                "year_of_study": 3,
+            },
+        )
+
+        duplicate_response = self.client.post(
+            "/students",
+            json={
+                "full_name": "Bob Otieno",
+                "email": "bob@example.com",
+                "password": "student123",
+                "phone_number": "0711223345",
+                "registration_number": "EN01-0101-2024",
+                "course": "Mathematics",
+                "year_of_study": 2,
+            },
+        )
+
+        self.assertEqual(duplicate_response.status_code, 409)
+        self.assertIn("already exists", duplicate_response.get_json()["message"])
+
 
 if __name__ == "__main__":
     unittest.main()
