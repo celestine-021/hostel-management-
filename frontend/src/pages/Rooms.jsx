@@ -1,99 +1,133 @@
-import { useEffect, useState } from "react";
-import Sidebar from "../components/Sidebar";
+import React, { useState, useEffect } from "react";
+
+// Use live Render backend URL fallback
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL ||
+  "https://hostel-management-backend-355h.onrender.com";
 
 function Rooms() {
   const [rooms, setRooms] = useState([]);
   const [hostels, setHostels] = useState([]);
-  const [form, setForm] = useState({ hostel_id: "", room_number: "", capacity: "", occupied_spaces: "0", price: "", status: "available" });
-  const [message, setMessage] = useState("");
-
-  const loadData = async () => {
-    const [roomsResponse, hostelsResponse] = await Promise.all([fetch("/rooms"), fetch("/hostels")]);
-    const roomsData = await roomsResponse.json();
-    const hostelsData = await hostelsResponse.json();
-    setRooms(roomsData);
-    setHostels(hostelsData);
-  };
+  const [formData, setFormData] = useState({
+    hostel_id: "",
+    room_number: "",
+    capacity: 2,
+    price: 0,
+  });
 
   useEffect(() => {
-    loadData();
+    fetchRooms();
+    fetchHostels();
   }, []);
+
+  // Retrieve room listings from Render
+  const fetchRooms = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/rooms`);
+      if (res.ok) {
+        const data = await res.json();
+        setRooms(Array.isArray(data) ? data : []);
+      }
+    } catch (err) {
+      console.error("Failed to load rooms:", err);
+    }
+  };
+
+  // Retrieve hostel dropdown options from Render
+  const fetchHostels = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/hostels`);
+      if (res.ok) {
+        const data = await res.json();
+        setHostels(Array.isArray(data) ? data : []);
+      }
+    } catch (err) {
+      console.error("Failed to load hostels for selection:", err);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch("/rooms", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, hostel_id: Number(form.hostel_id), capacity: Number(form.capacity), occupied_spaces: Number(form.occupied_spaces), price: Number(form.price) }),
-    });
-    const data = await response.json();
-    setMessage(data.message || "Room created");
-    setForm({ hostel_id: "", room_number: "", capacity: "", occupied_spaces: "0", price: "", status: "available" });
-    loadData();
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/rooms`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to create room record");
+      }
+
+      setFormData({ hostel_id: "", room_number: "", capacity: 2, price: 0 });
+      fetchRooms();
+    } catch (err) {
+      console.error("Error creating room:", err);
+    }
   };
 
   return (
-    <div className="app-layout">
-      <Sidebar />
-      <main className="main-content">
-        <div className="topbar">
-          <div>
-            <h1>Rooms</h1>
-            <p>Manage hostel rooms and room availability.</p>
-          </div>
-        </div>
+    <div style={{ padding: "20px" }}>
+      <h2>Rooms</h2>
 
-        <div className="content-card">
-          <h2>Add Room</h2>
-          {message && <p>{message}</p>}
-          <form onSubmit={handleSubmit} style={{ display: "grid", gap: "10px", maxWidth: "500px" }}>
-            <select value={form.hostel_id} onChange={(e) => setForm({ ...form, hostel_id: e.target.value })} required>
-              <option value="">Select hostel</option>
-              {hostels.map((hostel) => <option key={hostel.id} value={hostel.id}>{hostel.name}</option>)}
-            </select>
-            <input placeholder="Room number" value={form.room_number} onChange={(e) => setForm({ ...form, room_number: e.target.value })} required />
-            <input type="number" placeholder="Capacity" value={form.capacity} onChange={(e) => setForm({ ...form, capacity: e.target.value })} required />
-            <input type="number" placeholder="Occupied spaces" value={form.occupied_spaces} onChange={(e) => setForm({ ...form, occupied_spaces: e.target.value })} />
-            <input type="number" placeholder="Price" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required />
-            <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
-              <option value="available">Available</option>
-              <option value="occupied">Occupied</option>
-              <option value="maintenance">Maintenance</option>
-            </select>
-            <button type="submit" className="primary-button">Save Room</button>
-          </form>
-        </div>
+      <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
+        <h3>Add Room</h3>
+        <select
+          value={formData.hostel_id}
+          onChange={(e) => setFormData({ ...formData, hostel_id: e.target.value })}
+          required
+        >
+          <option value="">Select Hostel</option>
+          {hostels.map((h) => (
+            <option key={h.id} value={h.id}>
+              {h.name}
+            </option>
+          ))}
+        </select>
+        <input
+          type="text"
+          placeholder="Room Number"
+          value={formData.room_number}
+          onChange={(e) => setFormData({ ...formData, room_number: e.target.value })}
+          required
+        />
+        <input
+          type="number"
+          placeholder="Capacity"
+          value={formData.capacity}
+          onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
+        />
+        <input
+          type="number"
+          placeholder="Price"
+          value={formData.price}
+          onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+        />
+        <button type="submit">Add Room</button>
+      </form>
 
-        <div className="content-card">
-          <h2>Room List</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Room Number</th>
-                <th>Hostel</th>
-                <th>Capacity</th>
-                <th>Occupied</th>
-                <th>Available Beds</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rooms.length === 0 ? (
-                <tr><td colSpan="6">No rooms found.</td></tr>
-              ) : rooms.map((room) => (
-                <tr key={room.id}>
-                  <td>{room.room_number}</td>
-                  <td>{room.hostel}</td>
-                  <td>{room.capacity}</td>
-                  <td>{room.occupied_spaces}</td>
-                  <td>{room.available_beds}</td>
-                  <td>{room.status}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </main>
+      {/* Display active room records */}
+      <table border="1" cellPadding="8">
+        <thead>
+          <tr>
+            <th>Room Number</th>
+            <th>Hostel</th>
+            <th>Capacity</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rooms.map((room) => (
+            <tr key={room.id}>
+              <td>{room.room_number}</td>
+              <td>{room.hostel}</td>
+              <td>{room.capacity}</td>
+              <td>{room.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
