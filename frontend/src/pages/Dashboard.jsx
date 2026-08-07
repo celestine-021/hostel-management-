@@ -1,113 +1,237 @@
 import { useEffect, useState } from "react";
-import Sidebar from "../components/Sidebar";
+import Layout from "../components/Layout";
+import StatCard from "../components/StatCard";
 
-// Replace local host with your live Render URL (or fallback to local during development)
+import {
+  FaUserGraduate,
+  FaBuilding,
+  FaDoorOpen,
+  FaBed,
+  FaClipboardList,
+  FaMoneyBillWave,
+  FaTools
+} from "react-icons/fa";
+
+import "./Dashboard.css";
+
+
 const API_BASE_URL =
-  process.env.REACT_APP_API_URL ||
+  import.meta.env.VITE_API_URL ||
   "https://hostel-management-backend-355h.onrender.com";
 
+
 function Dashboard() {
+
+
   const [totalHostels, setTotalHostels] = useState(0);
   const [totalRooms, setTotalRooms] = useState(0);
   const [availableRooms, setAvailableRooms] = useState(0);
   const [totalStudents, setTotalStudents] = useState(0);
 
+
+
   useEffect(() => {
+
     fetchDashboardData();
+
   }, []);
 
-  // Fetch dashboard statistics from the backend
+
+
   const fetchDashboardData = async () => {
-    console.log("Fetching dashboard data...");
+
     try {
+
+
       // Fetch hostels
-      const hostelsResponse = await fetch(`${API_BASE_URL}/hostels`);
-      const hostelsData = await hostelsResponse.json();
-      console.log("Hostels:", hostelsData);
-      setTotalHostels(hostelsData.length);
+
+      const hostelsResponse = await fetch(
+        `${API_BASE_URL}/hostels`
+      );
+
+      const hostelsData =
+        await hostelsResponse.json();
+
+
 
       // Fetch rooms
-      const roomsResponse = await fetch(`${API_BASE_URL}/rooms`);
-      const roomsData = await roomsResponse.json();
-      console.log("Rooms:", roomsData);
-      setTotalRooms(roomsData.length);
 
-      // Count available rooms
-      const available = roomsData.filter(
-        (room) => room.status === "available"
+      const roomsResponse = await fetch(
+        `${API_BASE_URL}/rooms`
       );
-      setAvailableRooms(available.length);
+
+      const roomsData =
+        await roomsResponse.json();
+
+
 
       // Fetch students
-      const studentsResponse = await fetch(`${API_BASE_URL}/students`);
-      const studentsData = await studentsResponse.json();
-      console.log("Students:", studentsData);
-      setTotalStudents(studentsData.length);
 
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
+      const studentsResponse = await fetch(
+        `${API_BASE_URL}/students`
+      );
+
+      const studentsData =
+        await studentsResponse.json();
+
+
+
+      setTotalHostels(
+        hostelsData.length
+      );
+
+
+      setTotalRooms(
+        roomsData.length
+      );
+
+
+      setAvailableRooms(
+
+        roomsData.filter(
+          (room) =>
+          room.status?.toLowerCase() === "available"
+        ).length
+
+      );
+
+
+      setTotalStudents(
+        studentsData.length
+      );
+
+
+
+    } catch(error) {
+
+      console.error(
+        "Error fetching dashboard data:",
+        error
+      );
+
     }
+
   };
 
+
+
+
+
   return (
-    <div className="app-layout">
-      <Sidebar />
 
-      <main className="main-content">
-        {/* Header */}
-        <div className="topbar">
-          <div>
-            <h1>Dashboard</h1>
-            <p>Welcome to the JKUAT Hostel Management System.</p>
-          </div>
-          <div className="user-info">Administrator</div>
+    <Layout>
+
+
+      <div className="dashboard-container">
+
+
+
+        <div className="dashboard-header">
+
+          <h1>
+            Hostel Management Dashboard
+          </h1>
+
+
+          <p>
+            Manage students, hostels, rooms, bookings and maintenance from one place.
+          </p>
+
         </div>
 
-        {/* Statistics */}
-        <div className="dashboard-cards">
-          <div className="dashboard-card">
-            <div className="card-icon">👨‍🎓</div>
-            <div>
-              <h3>Total Students</h3>
-              <p>{totalStudents}</p>
-            </div>
-          </div>
 
-          <div className="dashboard-card">
-            <div className="card-icon">🏢</div>
-            <div>
-              <h3>Total Hostels</h3>
-              <p>{totalHostels}</p>
-            </div>
-          </div>
 
-          <div className="dashboard-card">
-            <div className="card-icon">🚪</div>
-            <div>
-              <h3>Total Rooms</h3>
-              <p>{totalRooms}</p>
-            </div>
-          </div>
 
-          <div className="dashboard-card">
-            <div className="card-icon">🛏️</div>
-            <div>
-              <h3>Available Rooms</h3>
-              <p>{availableRooms}</p>
-            </div>
-          </div>
+        <div className="dashboard">
+
+
+          <StatCard
+            icon={<FaUserGraduate />}
+            title="Students"
+            value={totalStudents}
+          />
+
+
+
+          <StatCard
+            icon={<FaBuilding />}
+            title="Hostels"
+            value={totalHostels}
+          />
+
+
+
+          <StatCard
+            icon={<FaDoorOpen />}
+            title="Rooms"
+            value={totalRooms}
+          />
+
+
+
+          <StatCard
+            icon={<FaBed />}
+            title="Available Rooms"
+            value={availableRooms}
+          />
+
+
+
+          <StatCard
+            icon={<FaClipboardList />}
+            title="Bookings"
+            value="0"
+          />
+
+
+
+          <StatCard
+            icon={<FaMoneyBillWave />}
+            title="Payments"
+            value="0"
+          />
+
+
+
+          <StatCard
+            icon={<FaTools />}
+            title="Maintenance"
+            value="0"
+          />
+
+
         </div>
 
-        {/* Recent Activities */}
+
+
+
+
         <div className="content-card">
-          <h2>Recent Activities</h2>
-          <div className="empty-state">
-            <p>No recent activities available.</p>
-          </div>
+
+
+          <h2>
+            Recent Activities
+          </h2>
+
+
+          <p>
+            No recent activities available.
+          </p>
+
+
         </div>
-      </main>
-    </div>
+
+
+
+      </div>
+
+
+    </Layout>
+
   );
+
 }
+
+
 
 export default Dashboard;

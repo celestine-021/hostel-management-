@@ -1,0 +1,260 @@
+/* Main container */
+.payments-container {
+    padding: 25px;
+    background: #f8fafc;
+    min-height: 100vh;
+}
+
+
+/* Header */
+.payments-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+
+.payments-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #1e293b;
+}
+
+
+
+/* Add button */
+.add-btn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+}
+
+
+.add-btn:hover {
+    background: #1d4ed8;
+}
+
+
+
+/* Search */
+.search-container {
+    background: white;
+    padding: 12px 15px;
+    width: 350px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+
+.search-container input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 15px;
+}
+
+
+
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+
+thead {
+    background: #2563eb;
+    color: white;
+}
+
+
+th,
+td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+
+tbody tr:hover {
+    background: #f1f5f9;
+}
+
+
+
+
+/* Status */
+.paid-status {
+    background: #dcfce7;
+    color: #15803d;
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+
+
+.pending-status {
+    background: #fef3c7;
+    color: #b45309;
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+
+
+
+/* Action buttons */
+.view-btn,
+.delete-btn {
+
+    border: none;
+    color: white;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 5px;
+
+}
+
+
+.view-btn {
+    background: #64748b;
+}
+
+
+.delete-btn {
+    background: #dc2626;
+}
+
+
+.view-btn:hover {
+    background:#475569;
+}
+
+
+.delete-btn:hover {
+    background:#b91c1c;
+}
+
+
+
+
+/* Modal background */
+.modal-overlay {
+
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+
+    background: rgba(0,0,0,0.5);
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+}
+
+
+
+/* Modal box */
+.payment-modal {
+
+    background:white;
+    width:400px;
+    padding:25px;
+    border-radius:12px;
+    position:relative;
+
+}
+
+
+
+.payment-modal h2 {
+
+    margin-bottom:20px;
+    color:#1e293b;
+
+}
+
+
+
+.close-btn {
+
+    position:absolute;
+    right:15px;
+    top:15px;
+
+    background:none;
+    border:none;
+
+    cursor:pointer;
+
+    font-size:20px;
+
+}
+
+
+
+/* Form */
+.payment-modal form {
+
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+
+}
+
+
+
+.payment-modal input,
+.payment-modal select {
+
+    padding:10px;
+    border:1px solid #cbd5e1;
+    border-radius:6px;
+
+}
+
+
+
+.save-btn {
+
+    margin-top:15px;
+
+    background:#16a34a;
+
+    color:white;
+
+    border:none;
+
+    padding:12px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}
+
+
+.save-btn:hover {
+
+    background:#15803d;
+
+}

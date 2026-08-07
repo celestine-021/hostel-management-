@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 // Define the live Render backend URL fallback
 const API_BASE_URL =
-  process.env.REACT_APP_API_URL ||
+  import.meta.env.VITE_API_URL ||
   "https://hostel-management-backend-355h.onrender.com";
 
 function Login() {

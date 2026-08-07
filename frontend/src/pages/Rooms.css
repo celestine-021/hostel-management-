@@ -1,0 +1,182 @@
+.rooms-container {
+    padding: 25px;
+    background: #f8fafc;
+    min-height: 100vh;
+}
+
+
+/* Header */
+.rooms-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.rooms-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #1e293b;
+}
+
+
+/* Add button */
+.add-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.add-btn:hover {
+    background: #1d4ed8;
+}
+
+
+/* Search */
+.search-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    width: 350px;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.search-container input {
+    width: 100%;
+    border: none;
+    outline: none;
+}
+
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+thead {
+    background: #2563eb;
+    color: white;
+}
+
+th,
+td {
+    padding: 14px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+tbody tr:hover {
+    background: #f1f5f9;
+}
+
+
+/* Modal background */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background: rgba(0,0,0,0.5);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 9999;
+}
+
+
+/* Modal box */
+.student-modal {
+    background: white;
+    width: 420px;
+    padding: 25px;
+    border-radius: 12px;
+
+    position: relative;
+}
+
+
+.student-modal h2 {
+    margin-bottom: 20px;
+}
+
+
+/* Close button */
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+
+    border: none;
+    background: transparent;
+    cursor: pointer;
+
+    font-size: 18px;
+}
+
+
+/* Form */
+.student-modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+
+.student-modal input,
+.student-modal select {
+
+    padding: 12px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 6px;
+
+    outline: none;
+
+}
+
+
+.save-btn {
+
+    background: #16a34a;
+
+    color: white;
+
+    border: none;
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    margin-top: 10px;
+
+}
+
+
+.save-btn:hover {
+
+    background: #15803d;
+
+}

@@ -5,7 +5,10 @@ import Dashboard from "./pages/Dashboard";
 import Students from "./pages/Students";
 import Hostels from "./pages/Hostels";
 import Rooms from "./pages/Rooms";
-
+import Bookings from "./pages/Bookings";
+import Payments from "./pages/Payments";
+import Maintenance from "./pages/Maintenance";
+import StudentDashboard from "./pages/StudentDashboard";
 function App() {
   return (
     <BrowserRouter>
@@ -44,7 +47,26 @@ function App() {
           element={<Rooms />}
         />
 
-      </Routes>
+        <Route
+          path="/bookings"
+          element={<Bookings />}
+        />
+
+        <Route
+          path="/payments"
+          element={<Payments />}
+        />  
+
+        <Route
+          path="/maintenance" 
+          element={<Maintenance />}
+        />  
+
+        <Route
+          path="/student-dashboard"
+          element={<StudentDashboard />}
+        />
+        </Routes>
     </BrowserRouter>
   );
 }

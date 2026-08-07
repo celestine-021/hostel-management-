@@ -4,9 +4,8 @@ import Sidebar from "../components/Sidebar";
 
 // Live Render API fallback URL
 const API_BASE_URL =
-  process.env.REACT_APP_API_URL ||
+  import.meta.env.VITE_API_URL ||
   "https://hostel-management-backend-355h.onrender.com";
-
 function Hostels() {
   // Page state management
   const [hostels, setHostels] = useState([]);
