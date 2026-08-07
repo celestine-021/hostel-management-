@@ -1,15 +1,24 @@
-from extensions import db
+from backend.models import db
+from sqlalchemy_serializer import SerializerMixin
 
-class Booking(db.Model):
+
+class Booking(db.Model, SerializerMixin):
+
     __tablename__ = "bookings"
 
-    id = db.Column(db.Integer, primary_key=True)
 
-    student_id = db.Column(
+    id = db.Column(
         db.Integer,
-        db.ForeignKey("students.id"),
+        primary_key=True
+    )
+
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id"),
         nullable=False
     )
+
 
     room_id = db.Column(
         db.Integer,
@@ -17,20 +26,18 @@ class Booking(db.Model):
         nullable=False
     )
 
-    booking_date = db.Column(
-        db.DateTime,
-        server_default=db.func.now()
-    )
 
     status = db.Column(
-        db.String(30),
+        db.String(50),
         default="Pending"
     )
 
-    student = db.relationship(
-        "Student",
+
+    user = db.relationship(
+        "User",
         back_populates="bookings"
     )
+
 
     room = db.relationship(
         "Room",
